@@ -49,7 +49,13 @@ int main() {
   ofstream fileOutput = ofstream("output.txt");
   auto time1 = clock();
 
-  double u[Nt + 1][N + 1];
+  //auto *y1 = new double[N + 1];
+  //auto *y2 = new double[N + 1];
+  //При использовании статического массива упираемся в стек при N>100
+  auto **u = new double *[(Nt + 1) * (N + 1)];
+  for (int i = 0; i < (Nt + 1); i++) {
+    u[i] = new double[N + 1];
+  }
 
   //начальные и краевые условия
   u[1][N] = u[1][0] = u[0][N] = u[0][0] = 0.0;
