@@ -52,30 +52,34 @@ int main() {
   //auto *y1 = new double[N + 1];
   //auto *y2 = new double[N + 1];
   //При использовании статического массива упираемся в стек при N>100
-  auto **u = new double *[(Nt + 1) * (N + 1)];
-  for (int i = 0; i < (Nt + 1); i++) {
-    u[i] = new double[N + 1];
-  }
+
+  //double u[(Nt + 1) * (N + 1)];
+  auto *u = new double[(Nt + 1) * (N + 1)];
+  /* for (int i = 0; i < (Nt + 1); i++) {
+     u[i] = *new double[N + 1];
+   }*/
 
   //начальные и краевые условия
-  u[1][N] = u[1][0] = u[0][N] = u[0][0] = 0.0;
+  u[N + 1] = u[N + N + 1] = u[N] = u[0] = 0.0;
   for (int i = 1; i < N; i++) {
     //x от 0 до 1 в i * h
-    u[0][i] = func(i * h); //y1
-    u[1][i] = u[0][i] + tau * g(i); //y2
+    u[0 * (N + 1) + i] = func(i * h); //y1
+    u[1 * (N + 1) + i] = u[0 * (N + 1) + i] + tau * g(i); //y2
   }
 
   //Идем по времени от 0 до T. y3 замена функции pp
   for (int t = 1; t < Nt; t++) {
-    u[t + 1][0] = 0.0;
-    u[t + 1][N] = 0.0;
+    u[(t + 1) * (N + 1) + 0] = 0.0;
+    u[(t + 1) * (N + 1) + N] = 0.0;
     for (int i = 1; i < N; i++) {
-      u[t + 1][i] = 2.0 * (1.0 - L2) * u[t][i] + L2 * (u[t][i + 1] + u[t][i - 1]) - u[t - 1][i];
+      u[(t + 1) * (N + 1) + i] =
+          2.0 * (1.0 - L2) * u[t * (N + 1) + i] + L2 * (u[t * (N + 1) + i + 1] + u[t * (N + 1) + i - 1])
+              - u[(t - 1) * (N + 1) + i];
     }
   }
 
-  //double time2 = (static_cast<double>(clock()) - time1) / CLOCKS_PER_SEC;
-  //fileOutput << "Time: " << time2 << "\n";
+  double time2 = (static_cast<double>(clock()) - time1) / CLOCKS_PER_SEC;
+  fileOutput << "Time: " << time2 << "\n";
 
   //выводим координаты x
   fileOutput << 0 << ",";
@@ -88,11 +92,13 @@ int main() {
     //координаты по T
     fileOutput << i * tau << ",";
     for (int j = 0; j < N; j++) {
-      fileOutput << u[i][j] << ",";
+      fileOutput << u[i * (N + 1) + j] << ",";
     }
-    fileOutput << u[i][N];
+    fileOutput << u[i * (N + 1) + N];
     fileOutput << "\n";
   }
   fileOutput.close();
+
+  delete[] u;
   return 0;
 }
