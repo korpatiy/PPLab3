@@ -4,7 +4,7 @@
 
 using namespace std;
 
-const int N = 191;
+const int N = 11;
 const double a = 1.0;
 const double h = a / N;
 const double tau = h * h / 2 / 2;
